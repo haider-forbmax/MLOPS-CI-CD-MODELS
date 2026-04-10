@@ -1,0 +1,205 @@
+{
+	"info": {
+		"_postman_id": "2c4389e1-4ed4-445d-8d63-46408a79b017",
+		"name": "Speech-to-Text API",
+		"description": "STT API supporting Urdu transcription using Whisper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Transcription",
+			"item": [
+				{
+					"name": "Transcribe Video/Audio",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Language",
+								"value": "english",
+								"description": "Language code (ur for Urdu)",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "video_file",
+									"description": "Video or audio file to transcribe",
+									"type": "file",
+									"src": "/home/nouman/Downloads/IQera Schools ｜ Artificial Intelligence ｜ Online Academy.mp4"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/transcribe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"transcribe"
+							]
+						},
+						"description": "Transcribe video or audio file to text with timestamps"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}"
+									},
+									{
+										"key": "X-Language",
+										"value": "ur"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "video_file",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/v1/transcribe",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"v1",
+										"transcribe"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"full_text\": \"Complete transcribed text from the audio/video\",\n  \"timestamp\": [\n    {\n      \"start\": 0.0,\n      \"end\": 5.5,\n      \"text\": \"First segment of transcription\"\n    },\n    {\n      \"start\": 5.5,\n      \"end\": 12.3,\n      \"text\": \"Second segment of transcription\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "System",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Health check endpoint with Whisper API server status"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"healthy\",\n  \"service\": \"Speech-to-Text API\",\n  \"triton_server\": \"connected\",\n  \"model_status\": \"ready\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Configuration",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/config",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"config"
+							]
+						},
+						"description": "Get current configuration including supported languages"
+					},
+					"response": []
+				},
+				{
+					"name": "Root / API Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Root endpoint with API information"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://stt-api-dgx.nimar.gov.pk",
+			"type": "string"
+		},
+		{
+			"key": "api_key",
+			"value": "apikey1",
+			"type": "string"
+		}
+	]
+}

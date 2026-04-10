@@ -1,0 +1,200 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stg-od-config
+  namespace: stg-model-apis
+data:
+  # Triton Inference Server Configuration
+  TRITON_SERVER_URL: "http://od-triton-predictor.ml-staging.svc.cluster.local"
+  TRITON_MODEL_NAME: "onnx"
+
+  # Model Input/Output Names
+  MODEL_INPUT_NAME: "images"
+  MODEL_OUTPUT_NAME: "output0"
+
+  # Model Dimensions
+  MODEL_INPUT_DIMS: "[3, -1, -1]"
+  MODEL_OUTPUT_DIMS: "[84, -1]"
+
+  # Default processing parameters
+  DEFAULT_INPUT_SIZE: "[640, 640]"
+  DEFAULT_CONFIDENCE_THRESHOLD: "0.25"
+  DEFAULT_NMS_THRESHOLD: "0.45"
+
+  # Image Processing Limits
+  MAX_IMAGE_SIZE: "10485760"
+  SUPPORTED_FORMATS: "jpeg,png,jpg,webp"
+
+  # API Configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+
+  # Timeouts
+  REQUEST_TIMEOUT: "30"
+  TRITON_TIMEOUT: "10"
+
+  # stg-od Specific Settings
+  TASK_TYPE: "detect"
+
+  # Logging Configuration
+  LOG_LEVEL: "DEBUG"
+
+  # API Security
+  API_KEY: "123"
+  TZ: Asia/Karachi
+
+  # # COCO Classes
+  # CLASSES: '{"0": "person", "1": "bicycle", "2": "car", "3": "motorcycle", "4": "airplane", "5": "bus", "6": "train", "7": "truck", "8": "boat", "9": "traffic light", "10": "fire hydrant", "11": "stop sign", "12": "parking meter", "13": "bench", "14": "bird", "15": "cat", "16": "dog", "17": "horse", "18": "sheep", "19": "cow", "20": "elephant", "21": "bear", "22": "zebra", "23": "giraffe", "24": "backpack", "25": "umbrella", "26": "handbag", "27": "tie", "28": "suitcase", "29": "frisbee", "30": "skis", "31": "snowboard", "32": "sports ball", "33": "kite", "34": "baseball bat", "35": "baseball glove", "36": "skateboard", "37": "surfboard", "38": "tennis racket", "39": "bottle", "40": "wine glass", "41": "cup", "42": "fork", "43": "knife", "44": "spoon", "45": "bowl", "46": "banana", "47": "apple", "48": "sandwich", "49": "orange", "50": "broccoli", "51": "carrot", "52": "hot dog", "53": "pizza", "54": "donut", "55": "cake", "56": "chair", "57": "couch", "58": "potted plant", "59": "bed", "60": "dining table", "61": "toilet", "62": "tv", "63": "laptop", "64": "mouse", "65": "remote", "66": "keyboard", "67": "cell phone", "68": "microwave", "69": "oven", "70": "toaster", "71": "sink", "72": "refrigerator", "73": "book", "74": "clock", "75": "vase", "76": "scissors", "77": "teddy bear", "78": "hair drier", "79": "toothbrush"}'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stg-od-openai-api
+  namespace: stg-model-apis
+  labels:
+    app: stg-od-openai-api
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stg-od-openai-api
+  template:
+    metadata:
+      labels:
+        app: stg-od-openai-api
+        version: v1
+    spec:
+      imagePullSecrets:
+      - name: harbor-secret    
+      containers:
+      - name: stg-od-api
+        image: harbor.nimar.gov.pk/mlops/yolo11-openai-api:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        command: ["uvicorn"]
+        args: ["api:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+        envFrom:
+        - configMapRef:
+            name: stg-od-config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stg-od-openai-api-service
+  namespace: stg-model-apis
+  labels:
+    app: stg-od-openai-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: stg-od-openai-api
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: stg-od-api-ingress
+ namespace: stg-model-apis
+ annotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /
+  nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+  nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+  nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+spec:
+ ingressClassName: nginx
+ rules:
+ - host: stg-od-dgx.nimar.gov.pk
+   http:
+     paths:
+     - path: /
+       pathType: Prefix
+       backend:
+         service:
+           name: stg-od-openai-api-service
+           port:
+             number: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: stg-od-openai-api-hpa
+  namespace: stg-model-apis
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: stg-od-openai-api
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60

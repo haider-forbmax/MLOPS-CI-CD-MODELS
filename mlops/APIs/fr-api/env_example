@@ -1,0 +1,23 @@
+# Service Endpoints
+MODEL_NAME=face_pipeline
+# API Keys (leave empty if not required)
+# Milvus Database Configuration
+FR_SERVICE_URL=192.168.18.30:3080
+DATABASE_NAME=NIMAR_Face_Embeddings
+MILVUS_ALIAS=default
+MILVUS_HOST=milvus-standalone
+MILVUS_PORT=19530
+MILVUS_COLLECTION_NAME=face_embedding
+MILVUS_VECTOR_DIM=512
+
+# Face Detection Parameters
+FACE_DETECTION_CONFIDENCE=0.5
+FACE_DETECTION_NMS_THRESHOLD=0.4
+
+# Face Recognition Parameters
+SIMILARITY_THRESHOLD=0.7
+MAX_FACES_PER_IMAGE=10
+
+# API Settings
+API_TIMEOUT=30
+API_KEY=123

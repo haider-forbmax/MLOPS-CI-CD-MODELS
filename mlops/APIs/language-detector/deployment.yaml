@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: language-detector-config
+  namespace: models-inference
+data:
+  MODEL_SIZE: "medium"
+  DEVICE: "cuda"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: language-detector
+  namespace: models-inference
+  labels:
+    app: language-detector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: language-detector
+  template:
+    metadata:
+      labels:
+        app: language-detector
+        kai.scheduler/queue: inference
+        inference: fastapi
+    spec:
+      schedulerName: kai-scheduler
+      imagePullSecrets:
+        - name: harbor-secret
+      containers:
+      - name: language-detector
+        image: harbor.nimar.gov.pk/mlops/language-detector:v3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: language-detector-config
+        resources:
+          limits:
+            # nvidia.com/gpu: 1
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            # nvidia.com/gpu: 1
+            cpu: "1"
+            memory: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+      tolerations:
+      - key: "nvidia.com/gpu"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: language-detector-service
+  namespace: models-inference
+spec:
+  selector:
+    app: language-detector
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: language-detector-ingress
+  namespace: models-inference
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+spec:
+  tls:
+    - hosts:
+      - lang-det-dgx.nimar.gov.pk
+      secretName: nimar-tls
+  rules:
+  - host: lang-det-dgx.nimar.gov.pk
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: language-detector-service
+            port:
+              number: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: language-detector-hpa
+  namespace: models-inference
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: language-detector
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

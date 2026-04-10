@@ -1,0 +1,61 @@
+{
+	"info": {
+		"_postman_id": "d020107a-1235-41de-97d9-718da5cb0da9",
+		"name": "Infernece Logo Endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "40870456"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://logo-dgx.nimar.gov.pk/health"
+			},
+			"response": []
+		},
+		{
+			"name": "Classes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://logo-dgx.nimar.gov.pk/classes"
+			},
+			"response": []
+		},
+		{
+			"name": "Config",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://logo-dgx.nimar.gov.pk/config"
+			},
+			"response": []
+		},
+		{
+			"name": "Detect",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"model\": \"yolo11n-logo\",\n  \"image\": {\n    \"type\": \"url\",\n    \"url\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuhFmK-McXfYKkMB1dajgtYilNca5XOi2DkqHTCou61XMlp4tmCPQfd5fgDgvOsaNriZo&usqp=CAU\"\n  },\n  \"parameters\": {\n    \"confidence\": 0.1,\n    \"nms_threshold\": 0.5\n  },\n  \"response_format\": {\n    \"labeled_image\": false,\n    \"object_images\": false,\n    \"annotated_image\": false\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://logo-dgx.nimar.gov.pk/v1/detect"
+			},
+			"response": []
+		}
+	]
+}

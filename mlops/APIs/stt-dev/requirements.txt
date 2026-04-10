@@ -1,0 +1,13 @@
+fastapi[all]
+faster-whisper
+pydub
+librosa
+soundfile
+audioread
+moviepy
+python-magic
+ffmpeg-python
+langdetect
+aiofiles
+requests
+numpy

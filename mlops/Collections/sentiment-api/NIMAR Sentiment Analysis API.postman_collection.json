@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "f465021a-d874-4b67-bb46-baff42adbc6a",
+		"name": "NIMAR Sentiment Analysis API",
+		"description": "NIMAR Sentiment Analysis API using gpt-oss-20b model",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sentiment-api-dgx.nimar.gov.pk/",
+					"protocol": "https",
+					"host": [
+						"sentiment-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sentiment-api-dgx.nimar.gov.pk/health",
+					"protocol": "https",
+					"host": [
+						"sentiment-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Analyze Sentiment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"description": "authorization header"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"text\": \"I love this car but its too expensive\"\n}"
+				},
+				"url": {
+					"raw": "https://sentiment-api-dgx.nimar.gov.pk/v1/sentiment",
+					"protocol": "https",
+					"host": [
+						"sentiment-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"sentiment"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"description": "Base URL for the API"
+		}
+	]
+}

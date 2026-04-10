@@ -1,0 +1,10 @@
+# Models store directory
+models-store/
+uploads/
+__pycache__/
+.marscode/
+*.pyc
+*.log
+logs/
+upload.log
+.codex

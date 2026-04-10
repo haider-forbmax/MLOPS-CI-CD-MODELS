@@ -1,0 +1,9 @@
+fastapi==0.115.12
+uvicorn==0.34.2
+requests==2.32.3
+Pillow==10.4.0
+pydantic==2.11.4
+pydantic-settings==2.9.1
+python-dotenv==1.1.0
+typing_extensions==4.13.2
+httpx==0.28.1

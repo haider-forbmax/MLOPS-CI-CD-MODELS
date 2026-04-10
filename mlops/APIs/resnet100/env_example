@@ -1,0 +1,31 @@
+# Triton Inference Server Configuration
+TRITON_SERVER_URL=192.168.18.80:30483
+TRITON_MODEL_NAME=resnet100
+# Model Input/Output Names (Based on resnet100 model config)
+MODEL_INPUT_NAME=input
+MODEL_OUTPUT_NAME=output
+
+# Input: [batch_size, channels, height, width] = [N, 3, -1, -1] (dynamic height/width)
+MODEL_INPUT_DIMS=[3, 122, 122]
+# Output: resnet100 outputs a 512-dimensional feature vector
+MODEL_OUTPUT_DIMS=[512]
+
+# Image Processing Limits       
+MAX_IMAGE_SIZE=10485760  # 10MB in bytes
+SUPPORTED_FORMATS=jpeg,png,jpg,webp
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=9002
+
+# Timeouts (in seconds)
+REQUEST_TIMEOUT=30
+TRITON_TIMEOUT=10
+
+# YOLO11 Specific Settings
+TASK_TYPE=embedding
+
+# Logging Configuration
+LOG_LEVEL=DEBUG
+
+API_KEY=123

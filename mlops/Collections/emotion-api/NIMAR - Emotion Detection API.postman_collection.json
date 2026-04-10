@@ -1,0 +1,396 @@
+{
+	"info": {
+		"_postman_id": "973a04e3-4e28-431b-a647-e76b0347d998",
+		"name": "NIMAR - Emotion Detection API",
+		"description": "Voice Compassion API for detecting emotions from audio/video files using Triton Inference Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Voice Compassion",
+			"item": [
+				{
+					"name": "Detect Emotion from Audio/Video",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer 123",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "video_file",
+									"description": "Upload audio or video file (mp4, wav, mp3, etc.)",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "https://se-api-dgx.nimar.gov.pk/v1/voice_compassion",
+							"protocol": "https",
+							"host": [
+								"se-api-dgx",
+								"nimar",
+								"gov",
+								"pk"
+							],
+							"path": [
+								"v1",
+								"voice_compassion"
+							]
+						},
+						"description": "Upload an audio or video file to detect emotions. The API will automatically extract audio from video files and return the detected emotion.\n\n**Supported Formats:**\n- Audio: .wav, .mp3, .flac, .aac, .ogg, .opus, .m4a, .aiff, .amr, .wma\n- Video: .mp4, .mkv, .webm, .avi, .mov, .mpg, .mpeg, .flv, .3gp, .ts, .f4v\n\n**Response:**\n```json\n{\n  \"emotion\": \"happy\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Success - Emotion Detected",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 123",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "video_file",
+											"type": "file",
+											"src": "sample_audio.wav"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/v1/voice_compassion",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"voice_compassion"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"emotion\": \"happy\"\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "video_file",
+											"type": "file",
+											"src": "sample_audio.wav"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/v1/voice_compassion",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"voice_compassion"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"detail\": \"Missing Authorization header\"\n}"
+						},
+						{
+							"name": "Error - No Audio in Video",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer 123",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "video_file",
+											"type": "file",
+											"src": "video_no_audio.mp4"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/v1/voice_compassion",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"v1",
+										"voice_compassion"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"The provided file does not contain any audio\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health & Info",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://se-api-dgx.nimar.gov.pk/health",
+							"protocol": "https",
+							"host": [
+								"se-api-dgx",
+								"nimar",
+								"gov",
+								"pk"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check the health status of the API and Triton inference server.\n\n**Response:**\n```json\n{\n  \"status\": \"healthy\",\n  \"timestamp\": \"2025-11-05T10:30:00.123456\",\n  \"version\": \"1.0.0\"\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Healthy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/health",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"healthy\",\n  \"timestamp\": \"2025-11-05T10:30:00.123456\",\n  \"version\": \"1.0.0\"\n}"
+						},
+						{
+							"name": "Unhealthy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/health",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "Service Unavailable",
+							"code": 503,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"detail\": {\n    \"status\": \"unhealthy\",\n    \"timestamp\": \"2025-11-05T10:30:00.123456\",\n    \"version\": \"1.0.0\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Configuration",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://se-api-dgx.nimar.gov.pk/config",
+							"protocol": "https",
+							"host": [
+								"se-api-dgx",
+								"nimar",
+								"gov",
+								"pk"
+							],
+							"path": [
+								"config"
+							]
+						},
+						"description": "Get the current API configuration including Triton server URL, model name, and supported file formats."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/config",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"config"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"triton_server_url\": \"192.168.18.22:32216\",\n  \"model_name\": \"speech_emotion_recognition\",\n  \"supported_extensions\": [\".wav\", \".mp3\", \".flac\", \".mp4\", \".mkv\", \".webm\"]\n}"
+						}
+					]
+				},
+				{
+					"name": "Root - API Info",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://se-api-dgx.nimar.gov.pk/",
+							"protocol": "https",
+							"host": [
+								"se-api-dgx",
+								"nimar",
+								"gov",
+								"pk"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Get general API information including available endpoints and supported formats."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"service\": \"Voice Compassion API\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Voice Compassion API using Triton Inference Server\",\n  \"endpoints\": {\n    \"voice_compassion\": \"/v1/voice-compassion/\",\n    \"health\": \"/health\",\n    \"config\": \"/config\",\n    \"docs\": \"/docs\"\n  },\n  \"supported_formats\": {\n    \"video\": [\".mp4\", \".mkv\", \".webm\", \".avi\", \".mov\"],\n    \"audio\": [\".wav\", \".mp3\", \".flac\", \".aac\", \".ogg\"]\n  }\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{API_KEY}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "https://se-api-dgx.nimar.gov.pk",
+			"type": "string"
+		},
+		{
+			"key": "API_KEY",
+			"value": "123",
+			"type": "string"
+		}
+	]
+}

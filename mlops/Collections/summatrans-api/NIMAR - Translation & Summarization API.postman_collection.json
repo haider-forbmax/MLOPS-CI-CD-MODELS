@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "3bbc7f22-21ed-49c1-9acc-044a286c3c43",
+		"name": "NIMAR - Translation & Summarization API",
+		"description": "API for translating between English and Urdu, and summarizing text",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://summatrans-dgx.nimar.gov.pk/",
+					"protocol": "https",
+					"host": [
+						"summatrans-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Translate Text",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"text\": \"This project leverages the Whisper model to recognize emotions in speech. The goal is to classify audio recordings into different emotional categories, such as Happy, Sad, Surprised, and etc\"\n}"
+				},
+				"url": {
+					"raw": "https://summatrans-dgx.nimar.gov.pk/v1/translate",
+					"protocol": "https",
+					"host": [
+						"summatrans-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"translate"
+					]
+				},
+				"description": "Translate text between English and Urdu automatically"
+			},
+			"response": []
+		},
+		{
+			"name": "Summarize Text",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"text\": \"Long article text here that you want to summarize. This can be in either English or Urdu language. The summary will always be returned in English regardless of the input language.\"\n}"
+				},
+				"url": {
+					"raw": "https://summatrans-dgx.nimar.gov.pk/v1/summarize",
+					"protocol": "https",
+					"host": [
+						"summatrans-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"summarize"
+					]
+				},
+				"description": "Generate an English summary of the input text (English or Urdu)"
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Tokens",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"text\": \"This is a sample text you want to check token count for.\"\n}"
+				},
+				"url": {
+					"raw": "https://summatrans-dgx.nimar.gov.pk/v1/validate-tokens",
+					"protocol": "https",
+					"host": [
+						"summatrans-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"validate-tokens"
+					]
+				},
+				"description": "Validate the number of tokens in input text before translation or summarization"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "authorization_token",
+			"value": "your-auth-token-here",
+			"type": "string"
+		}
+	]
+}

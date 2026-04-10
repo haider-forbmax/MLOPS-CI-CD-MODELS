@@ -1,0 +1,253 @@
+{
+	"info": {
+		"_postman_id": "cba5401b-fb39-411f-a40f-e5123db326c2",
+		"name": "NIMAR - Speaker Recognition API",
+		"description": "API for speaker recognition operations including adding, recognizing, and deleting speakers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sr-api-dgx.nimar.gov.pk/health",
+					"protocol": "https",
+					"host": [
+						"sr-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Health check endpoint with Triton server and model status"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Config",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sr-api-dgx.nimar.gov.pk/config",
+					"protocol": "https",
+					"host": [
+						"sr-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"config"
+					]
+				},
+				"description": "Get current configuration"
+			},
+			"response": []
+		},
+		{
+			"name": "Root",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sr-api-dgx.nimar.gov.pk/",
+					"protocol": "https",
+					"host": [
+						"sr-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "Root endpoint with API information"
+			},
+			"response": []
+		},
+		{
+			"name": "Speaker Recognition",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "video_file",
+							"description": "Video file for speaker recognition",
+							"type": "file",
+							"src": "/home/nouman/Downloads/Prime Minister Imran Khan’s Historical Speech at Public Rally in Lahore.mp4"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://sr-api-dgx.nimar.gov.pk/v1/speaker_recognition/",
+					"protocol": "https",
+					"host": [
+						"sr-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"speaker_recognition",
+						""
+					]
+				},
+				"description": "Recognize speaker from video file"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Speaker",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "audio_file",
+							"description": "Audio or video file for adding speaker",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "https://sr-api-dgx.nimar.gov.pk/v1/add_speaker?person_label=speaker_name",
+					"protocol": "https",
+					"host": [
+						"sr-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"add_speaker"
+					],
+					"query": [
+						{
+							"key": "person_label",
+							"value": "speaker_name",
+							"description": "Label/name for the speaker to add"
+						}
+					]
+				},
+				"description": "Endpoint to add a new speaker using an audio or video file. Validates that the file has a non-silent audio track."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Speaker",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://sr-api-dgx.nimar.gov.pk/v1/delete_speaker?person_label=speaker_name",
+					"protocol": "https",
+					"host": [
+						"sr-api-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"delete_speaker"
+					],
+					"query": [
+						{
+							"key": "person_label",
+							"value": "speaker_name",
+							"description": "Label/name of the speaker to delete"
+						}
+					]
+				},
+				"description": "Delete a speaker by their label/name"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Pre-request script (optional)"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Test script (optional)",
+					"pm.test(\"Status code is 200\", function () {",
+					"    pm.response.to.have.status(200);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string",
+			"description": "Base URL for the API"
+		},
+		{
+			"key": "auth_token",
+			"value": "your_auth_token_here",
+			"type": "string",
+			"description": "Bearer token for authorization (if required)"
+		}
+	]
+}

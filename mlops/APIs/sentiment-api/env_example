@@ -1,0 +1,13 @@
+BASE_URL=https://gptoss-dgx.nimar.gov.pk/v1   #FOR DEV
+# BASE_URL=http://vllm-gptoss-service.models-inference.svc.cluster.local:8000/v1
+MODEL_NAME=gpt-oss-20b
+LLM_API_KEY=EMPTY
+API_KEY=123
+LOG_LEVEL=INFO
+PORT=8000
+DYNAMIC_SENTIMENT_PROMPT="Classify the given text into one of these sentiments **from Pakistan's perspective**: - Positive: Expressing satisfaction, approval, optimism, progress, or benefit for Pakistan - Negative: Expressing criticism, threat, harm, instability, or disadvantage for Pakistan - Neutral: Factual, balanced, or emotionless statements without clear impact on Pakistan"
+MAX_EXAMPLES_PER_CLASS = 5
+MIN_LENGTH = 20
+MAX_LENGTH = 500
+CLASSES = ["Positive", "Negative", "Neutral", "Very Positive", "Very Negative"]
+EXAMPLES = '{"Positive":["Pakistan economy is improving","Exports are rising"],"Negative":["Policy failure caused inflation"]}'

@@ -1,0 +1,147 @@
+{
+	"info": {
+		"_postman_id": "9424ff93-2d62-4532-9719-7a01cd92d6c1",
+		"name": "NIMAR - Document OCR API",
+		"description": "OCR service supporting multiple document formats",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Root Endpoint",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://doc-ocr-dgx.nimar.gov.pk/",
+					"protocol": "https",
+					"host": [
+						"doc-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "API information and supported formats"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://doc-ocr-dgx.nimar.gov.pk/health",
+					"protocol": "https",
+					"host": [
+						"doc-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Check API health status"
+			},
+			"response": []
+		},
+		{
+			"name": "Config",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://doc-ocr-dgx.nimar.gov.pk/config",
+					"protocol": "https",
+					"host": [
+						"doc-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"config"
+					]
+				},
+				"description": "Get API configuration and supported formats"
+			},
+			"response": []
+		},
+		{
+			"name": "Process Document OCR",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"description": "Document to process (any supported format)",
+							"type": "file",
+							"src": "/home/nouman/Downloads/Complete Deployment Guide.pdf"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://doc-ocr-dgx.nimar.gov.pk/v1/document_ocr",
+					"protocol": "https",
+					"host": [
+						"doc-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"document_ocr"
+					]
+				},
+				"description": "OCR endpoint that processes ANY supported document format"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://doc-ocr-dgx.nimar.gov.pk",
+			"type": "string"
+		},
+		{
+			"key": "api_key",
+			"value": "Bearer 123",
+			"type": "string"
+		}
+	]
+}

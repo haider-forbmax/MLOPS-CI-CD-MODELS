@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+numpy
+Pillow
+requests
+opencv-python-headless
+tritonclient[http]

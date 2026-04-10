@@ -1,0 +1,16 @@
+fastapi[all]
+faster-whisper
+pydub
+librosa
+soundfile
+audioread
+moviepy
+python-magic
+ffmpeg-python
+langdetect
+aiofiles
+requests
+numpy
+tritonclient==2.62.0
+openai==2.6.1
+httpx==0.28.1

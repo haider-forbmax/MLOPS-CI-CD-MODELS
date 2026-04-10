@@ -1,0 +1,34 @@
+
+fastapi==0.115.0
+uvicorn==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+librosa==0.10.2.post1
+## pydub==0.25.1
+soundfile==0.12.1
+soxr==0.5.0.post1
+
+moviepy==1.0.3
+imageio==2.35.1
+imageio-ffmpeg==0.5.1
+
+torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cpu  
+## torchvision==0.19.1
+numpy==1.26.4
+scipy==1.14.1
+
+pyannote.audio==3.3.0
+pyannote.core==5.0.0
+## pyannote.pipeline==3.0.1
+
+pymilvus==2.5.8
+
+tritonclient==2.61.0
+gevent==25.9.1
+geventhttpclient==2.3.5
+
+requests==2.32.3
+## tqdm==4.66.5
+python-multipart==0.0.10

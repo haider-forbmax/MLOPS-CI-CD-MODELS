@@ -1,0 +1,36 @@
+API_HOST=0.0.0.0
+API_PORT=2022
+
+# Model configs - vLLM Whisper API
+MODEL_URL=https://docling-dgx.nimar.gov.pk/v1/audio/transcriptions
+ENGLISH_MODEL_URL = http://192.168.18.30:8071
+LANGUAGE_DETECTOR_URL = http://192.168.18.164:2021
+URDU_MODEL_URL = http://192.168.18.30:8070
+MODEL_NAME=whisper-large-v3
+ENGLISH_MODEL_NAME = whisper-distil-large-v3.5
+URDU_MODEL_NAME = whisper-large-v3-ft-urdu
+RESPONSE_FORMAT=json
+TEMPERATURE=0.0
+LANGUAGE=en
+REQUEST_TIMEOUT=300
+SSL_VERIFY=false
+
+# Legacy Triton configs (not used with vLLM)
+MODEL_INPUT_NAME=input__0
+MODEL_OUTPUT_NAME=output__0
+
+# API Keys (comma separated: username:key)
+API_KEY=123
+USER_API_KEYS=user1:123,user2:123
+
+# Upload configuration
+UPLOADS_DIR=./uploads
+VIDEO_EXTENSIONS=.mp4,.avi,.mov,.wmv,.mkv,.flv
+
+# Logging
+LOG_FILE=upload.log
+LOG_LEVEL=INFO
+
+# Supported options
+SUPPORTED_LANGUAGES=urdu,english
+SUPPORTED_NEWS_TYPES=live,on_demand

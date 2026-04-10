@@ -1,0 +1,101 @@
+{
+	"info": {
+		"_postman_id": "7d24c95b-b44f-43bc-8f8f-6f053a53ecd3",
+		"name": "NIMAR - Scene Detection API",
+		"description": "API for scene and object detection using Microsoft Florence-2 model",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://scene-detection-dgx.nimar.gov.pk/health",
+					"protocol": "https",
+					"host": [
+						"scene-detection-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Live Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://scene-detection-dgx.nimar.gov.pk/live",
+					"protocol": "https",
+					"host": [
+						"scene-detection-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"live"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene Detection",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"model\": \"microsoft/Florence-2-base\",\n  \"image\": {\n    \"type\": \"base64\",\n    \"data\": \"{{base64Image}}\"\n  },\n  \"parameters\": {\n    \"confidence\": 0.7,\n    \"nms_threshold\": 0.5\n  },\n  \"response_format\": {\n    \"labeled_image\": true,\n    \"object_images\": false,\n    \"annotated_image\": true\n  }\n}"
+				},
+				"url": {
+					"raw": "https://scene-detection-dgx.nimar.gov.pk/v1/scene_detection",
+					"protocol": "https",
+					"host": [
+						"scene-detection-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"scene_detection"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "authorization",
+			"value": "Bearer your-token",
+			"type": "string"
+		}
+	]
+}

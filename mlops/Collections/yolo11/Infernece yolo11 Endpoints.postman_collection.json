@@ -1,0 +1,61 @@
+{
+	"info": {
+		"_postman_id": "d09f6b4e-32c8-489f-96a8-c6fe74892f7d",
+		"name": "Infernece yolo11 Endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "40870456"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "https://yolo11-dgx.nimar.gov.pk/health"
+			},
+			"response": []
+		},
+		{
+			"name": "Classes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "https://yolo11-dgx.nimar.gov.pk/classes"
+			},
+			"response": []
+		},
+		{
+			"name": "Config",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "https://yolo11-dgx.nimar.gov.pk/config"
+			},
+			"response": []
+		},
+		{
+			"name": "Detect",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"model\": \"yolo11\",\n  \"image\": {\n    \"type\": \"url\",\n    \"url\": \"https://bmkltsly13vb.compat.objectstorage.ap-singapore-1.oraclecloud.com/cdn.sg.dailymirror.lk/assets/uploads/image_89b52166e8.jpg\"\n  },\n  \"parameters\": {\n    \"confidence\": 0.8,\n    \"nms_threshold\": 0.5\n  },\n  \"response_format\": {\n    \"labeled_image\": true,\n    \"object_images\": true,\n    \"annotated_image\": true\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://yolo11-dgx.nimar.gov.pk/v1/detect"
+			},
+			"response": []
+		}
+	]
+}

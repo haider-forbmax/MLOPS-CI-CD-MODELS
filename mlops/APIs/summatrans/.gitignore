@@ -1,0 +1,13 @@
+# Environment files
+.env
+*.env
+
+# Python environments
+my_venv/
+torch/
+
+# Logs
+*.log
+
+# Model / data artifacts
+*.pkl

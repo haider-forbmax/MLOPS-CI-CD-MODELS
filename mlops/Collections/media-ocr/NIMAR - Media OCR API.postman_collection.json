@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "24ea12d3-f6b9-4929-8bc2-bfd07c1ada27",
+		"name": "NIMAR - Media OCR API",
+		"description": "API for Optical Character Recognition from images",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48775758"
+	},
+	"item": [
+		{
+			"name": "Root Endpoint",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://media-ocr-dgx.nimar.gov.pk/",
+					"protocol": "https",
+					"host": [
+						"media-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "API root endpoint with basic info."
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://media-ocr-dgx.nimar.gov.pk/health",
+					"protocol": "https",
+					"host": [
+						"media-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Check if the OCR model is ready."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Config",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://media-ocr-dgx.nimar.gov.pk/config",
+					"protocol": "https",
+					"host": [
+						"media-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"config"
+					]
+				},
+				"description": "Get current configuration"
+			},
+			"response": []
+		},
+		{
+			"name": "OCR Processing",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 123",
+						"description": "Optional authorization header"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"image_base64\": \"{{sample_base64_image}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://media-ocr-dgx.nimar.gov.pk/v1/ocr",
+					"protocol": "https",
+					"host": [
+						"media-ocr-dgx",
+						"nimar",
+						"gov",
+						"pk"
+					],
+					"path": [
+						"v1",
+						"ocr"
+					]
+				},
+				"description": "Process OCR from base64-encoded image"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Pre-request script can be used to generate dynamic values",
+					"console.log('Making request to: ' + pm.variables.get('base_url'));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Test scripts to verify API responses",
+					"pm.test(\"Status code is 200\", function () {",
+					"    pm.response.to.have.status(200);",
+					"});",
+					"",
+					"// For OCR endpoint specifically",
+					"if (pm.request.url.toString().includes('/v1/ocr')) {",
+					"    pm.test(\"OCR response has content field\", function () {",
+					"        var jsonData = pm.response.json();",
+					"        pm.expect(jsonData).to.have.property('content');",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string",
+			"description": "Base URL for the API"
+		},
+		{
+			"key": "api_key",
+			"value": "your-api-key-here",
+			"type": "string",
+			"description": "API key for authorization (if required)"
+		},
+		{
+			"key": "sample_base64_image",
+			"value": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+			"type": "string",
+			"description": "Sample base64 encoded image (1x1 red pixel)"
+		}
+	]
+}
