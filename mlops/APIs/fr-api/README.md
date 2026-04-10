@@ -1,5 +1,5 @@
 # Face Recognition API
-# test for the github actions
+# test for the github actions.
 A production-ready REST API for real-time face detection and recognition using YOLOv5 face detection, ResNet face embeddings, and Milvus vector database. This API provides high-performance face recognition capabilities with enterprise-grade reliability and scalability.
 
 ## 🎯 API Overview
