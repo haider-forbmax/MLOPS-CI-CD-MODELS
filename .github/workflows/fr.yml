@@ -35,7 +35,7 @@ jobs:
       - name: Login to Harbor
         uses: docker/login-action@v3
         with:
-          registry: harbour.nimar.gov.pk
+          registry: harbor.nimar.gov.pk
           username: ${{ secrets.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
 
@@ -53,8 +53,8 @@ jobs:
 
           # ==================== Harbor Tags (Active) ====================
           tags: |
-            harbour.nimar.gov,pk/mlops/fr-test-client:latest
-            harbour.nimar.gov.pk/mlops/fr-test-client:${{ github.sha }}
+            harbor.nimar.gov,pk/mlops/fr-test-client:latest
+            harbor.nimar.gov.pk/mlops/fr-test-client:${{ github.sha }}
 
           # Cache configuration
           cache-from: type=registry,ref=harbour.forbmax.ai/mlops/fr-client:latest
