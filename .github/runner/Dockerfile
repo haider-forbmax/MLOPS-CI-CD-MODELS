@@ -10,5 +10,8 @@ RUN curl -L -o /usr/local/bin/kaniko-executor \
 # Create kaniko directory with proper permissions
 RUN mkdir -p /kaniko/.docker && chmod -R 777 /kaniko
 
-# Switch back to runner user (good security practice)
+# Switch back to runner user
 USER runner
+
+# Verify the entrypoint exists (for debugging)
+RUN ls -la /home/runner/ || ls -la / || ls -la /actions-runner/
