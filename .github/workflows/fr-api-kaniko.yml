@@ -11,30 +11,28 @@ jobs:
   build-and-push:
     runs-on: fr-api-runners
 
-    container:
-      image: gcr.io/kaniko-project/executor:v1.23.0-debug
-      options: --user root
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build and Push Image with Kaniko
+      - name: Build and Push with Kaniko
         run: |
-          echo "🔧 Creating Docker config for Harbor..."
+          echo "Creating Kaniko config..."
           mkdir -p /kaniko/.docker
+
+          AUTH=$(echo -n "${{ secrets.HARBOR_USERNAME }}:${{ secrets.HARBOR_PASSWORD }}" | base64 | tr -d '\n')
 
           cat <<EOF > /kaniko/.docker/config.json
           {
             "auths": {
               "harbor.nimar.gov.pk": {
-                "auth": "$(echo -n '${{ secrets.HARBOR_USERNAME }}:${{ secrets.HARBOR_PASSWORD }}' | base64)"
+                "auth": "$AUTH"
               }
             }
           }
           EOF
 
-          echo "🚀 Starting Kaniko build and push..."
+          echo "Running Kaniko build..."
 
           /kaniko/executor \
             --context ./mlops/APIs/fr-api \
@@ -43,7 +41,4 @@ jobs:
             --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
             --cache=true \
             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
-            --insecure-registry harbor.nimar.gov.pk \
-            --skip-unused-cache \
-            --push-retry=3 \
             --verbosity=info
