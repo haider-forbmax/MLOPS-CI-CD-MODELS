@@ -1,0 +1,23 @@
+apiVersion: actions.github.com/v1alpha1
+kind: AutoscalingRunnerSet
+metadata:
+  name: fr-api-runner-set
+  namespace: arc-runners
+spec:
+  githubConfigUrl: "https://github.com/haider-forbmax/MLOPS-CI-CD-MODELS"   # Change if using org/enterprise
+  githubConfigSecret: github-token-secret
+  maxRunners: 5          # Maximum runners that can spin up
+  minRunners: 1          # Minimum idle runners
+  runnerScaleSetName: "fr-api-runners"
+  template:
+    spec:
+      containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest   # Official runner image
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+          requests:
+            cpu: "1"
+            memory: "2Gi"
