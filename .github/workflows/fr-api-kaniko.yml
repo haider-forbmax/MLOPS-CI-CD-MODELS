@@ -21,11 +21,11 @@ jobs:
 
       - name: Build and Push with Kaniko
         run: |
-          echo "🔧 Creating Kaniko auth config..."
+          echo "Setting up Kaniko authentication..."
 
           mkdir -p /kaniko/.docker
 
-          cat <<'EOF' > /kaniko/.docker/config.json
+          cat <<EOF > /kaniko/.docker/config.json
           {
             "auths": {
               "harbor.nimar.gov.pk": {
@@ -35,7 +35,7 @@ jobs:
           }
           EOF
 
-          echo "🚀 Running Kaniko build & push..."
+          echo "Starting Kaniko build and push..."
 
           /kaniko/executor \
             --context ./mlops/APIs/fr-api \
@@ -45,5 +45,4 @@ jobs:
             --cache=true \
             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
             --insecure-registry harbor.nimar.gov.pk \
-            --push-retry=3 \
-            --verbosity=info
+            --push-retry=3
