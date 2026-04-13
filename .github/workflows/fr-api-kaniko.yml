@@ -5,17 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'mlops/APIs/fr-api/**'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'mlops/APIs/fr-api/**'
   workflow_dispatch:
 
 jobs:
   build-and-push:
     runs-on: fr-api-runners
 
-    # Run the whole job inside Kaniko executor
     container:
       image: gcr.io/kaniko-project/executor:v1.23.0-debug
       options: --user root
@@ -24,9 +19,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build and Push with Kaniko
+      - name: Build and Push Image with Kaniko
         run: |
-          # Create Docker config for Harbor authentication
+          echo "🔧 Creating Docker config for Harbor..."
           mkdir -p /kaniko/.docker
 
           cat <<EOF > /kaniko/.docker/config.json
@@ -39,6 +34,8 @@ jobs:
           }
           EOF
 
+          echo "🚀 Starting Kaniko build and push..."
+
           /kaniko/executor \
             --context ./mlops/APIs/fr-api \
             --dockerfile ./mlops/APIs/fr-api/Dockerfile \
@@ -48,4 +45,5 @@ jobs:
             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
             --insecure-registry harbor.nimar.gov.pk \
             --skip-unused-cache \
-            --push-retry=3
+            --push-retry=3 \
+            --verbosity=info
