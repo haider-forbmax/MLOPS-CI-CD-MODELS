@@ -2,20 +2,17 @@ FROM ghcr.io/actions/actions-runner:latest
 
 USER root
 
-# Install Kaniko
+# Install Kaniko executor
 RUN curl -L -o /usr/local/bin/kaniko-executor \
     https://github.com/GoogleContainerTools/kaniko/releases/download/v1.23.0/executor_linux_amd64 \
     && chmod +x /usr/local/bin/kaniko-executor
 
-# Create kaniko directory
-RUN mkdir -p /kaniko/.docker && chmod -R 777 /kaniko
+# Create kaniko dirs with proper permissions
+RUN mkdir -p /kaniko/.docker \
+    && chown -R runner:runner /kaniko \
+    && chmod -R 777 /kaniko   # Kaniko often needs this for config.json
 
-# Reset entrypoint so Kubernetes can control the command
-USER root
-RUN echo '#!/bin/bash\nexec "$@"' > /reset-entrypoint.sh && chmod +x /reset-entrypoint.sh
+# Optional: install useful tools if your workflows need them (git, etc. are already in base image)
+# RUN apt-get update && apt-get install -y --no-install-recommends ... && rm -rf /var/lib/apt/lists/*
 
 USER runner
-
-# Override the parent image's entrypoint
-ENTRYPOINT []
-CMD []
