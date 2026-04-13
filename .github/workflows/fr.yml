@@ -1,12 +1,14 @@
-name: Build & Push fr-api to DockerHub
+name: Build & Push fr-api to Docker Hub
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'mlops/APIs/fr-api/**'
   pull_request:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'mlops/APIs/fr-api/**'
   workflow_dispatch:
@@ -15,10 +17,6 @@ jobs:
   build-and-push:
     runs-on: self-hosted
 
-    defaults:
-      run:
-        working-directory: ./mlops/APIs/fr-api
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,18 +24,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}   # Change secret name if needed
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./mlops/APIs/fr-api          # ← This is the fix
+          file: ./mlops/APIs/fr-api/Dockerfile   # Explicit full path
           push: true
-          tags: haiderali11/fr-client:latest
+          tags: haiderali11/fr-client:latest     # ← Replace with your actual Docker Hub username/repo
           cache-from: type=registry,ref=haiderali11/fr-client:latest
           cache-to: type=inline
