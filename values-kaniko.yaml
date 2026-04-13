@@ -1,0 +1,59 @@
+githubConfigUrl: "https://github.com/haider-forbmax/MLOPS-CI-CD-MODELS"
+githubConfigSecret: github-token-secret
+runnerScaleSetName: fr-api-runners
+minRunners: 1
+maxRunners: 5
+
+containerMode:
+  type: "kubernetes"
+
+template:
+  spec:
+    # This is the correct place for imagePullSecrets in gha-runner-scale-set
+    imagePullSecrets:
+      - name: dockerhub-secret
+
+    securityContext:
+      fsGroup: 1001
+      runAsUser: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+
+    initContainers:
+      - name: volume-permissions
+        image: alpine:3.20
+        command:
+          - sh
+          - -c
+          - |
+            chown -R 1001:1001 /home/runner
+            chmod +x /home/runner/run.sh || true
+            echo "=== Volume permissions fixed ==="
+            ls -la /home/runner
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+          - name: work
+            mountPath: /home/runner
+
+    containers:
+      - name: runner
+        image: harbor.nimar.gov.pk/mlops/actions-runner-kaniko:latest
+        command: ["/home/runner/run.sh"]
+        env:
+          - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+            value: "false"
+        volumeMounts:
+          - name: work
+            mountPath: /home/runner
+
+    volumes:
+      - name: work
+        ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              storageClassName: standard
+              resources:
+                requests:
+                  storage: 2Gi
