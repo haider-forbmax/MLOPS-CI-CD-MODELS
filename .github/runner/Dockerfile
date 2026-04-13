@@ -10,5 +10,12 @@ RUN curl -L -o /usr/local/bin/kaniko-executor \
 # Create kaniko directory
 RUN mkdir -p /kaniko/.docker && chmod -R 777 /kaniko
 
-# The official image uses /home/runner/run.sh as the command
+# Reset entrypoint so Kubernetes can control the command
+USER root
+RUN echo '#!/bin/bash\nexec "$@"' > /reset-entrypoint.sh && chmod +x /reset-entrypoint.sh
+
 USER runner
+
+# Override the parent image's entrypoint
+ENTRYPOINT []
+CMD []
