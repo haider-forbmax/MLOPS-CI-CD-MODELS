@@ -19,10 +19,17 @@ jobs:
           # 1. Prepare the directory
           sudo mkdir -p /kaniko/.docker
           
-          # 2. Generate Base64 auth string
-          # Using secrets for security. Format is 'username:password'
-          # Note: 'robot$mlops+mlops' is the username for Harbor robot accounts
-          AUTH=$(echo -n "robot\$mlops+mlops:${{ secrets.HARBOR_ROBOT_SECRET }}" | base64 -w 0)
+          # 2. Generate Base64 auth string using your GitHub Secrets
+          USERNAME="${{ secrets.HARBOR_USERNAME }}"
+          PASSWORD="${{ secrets.HARBOR_PASSWORD }}"
+          
+          if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+            echo "Error: HARBOR_USERNAME or HARBOR_PASSWORD is empty. Please check your GitHub Secrets."
+            exit 1
+          fi
+
+          # Create 'user:password' string and base64 encode it
+          AUTH=$(echo -n "${USERNAME}:${PASSWORD}" | base64 -w 0)
           
           # 3. Create config.json
           cat <<EOF | sudo tee /kaniko/.docker/config.json
@@ -53,6 +60,8 @@ jobs:
             --insecure-registry "harbor.nimar.gov.pk" \
             --push-retry=3 \
             --verbosity=info
+
+            
 # name: Build & Push fr-api with Kaniko
 
 # on:
