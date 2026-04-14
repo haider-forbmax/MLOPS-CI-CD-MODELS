@@ -80,8 +80,6 @@ jobs:
             --ignore-path=/sys \
             --ignore-path=/
 
-
-
             
 # name: Build & Push fr-api with Kaniko
 
