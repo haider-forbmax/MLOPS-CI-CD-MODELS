@@ -59,8 +59,9 @@ jobs:
             --cache-repo="harbor.nimar.gov.pk/mlops/fr-client-cache" \
             --insecure-registry "harbor.nimar.gov.pk" \
             --push-retry=3 \
-            --verbosity=info
-
+            --verbosity=info \
+            --ignore-path=/product_uuid \
+            --ignore-path=/proc
             
 # name: Build & Push fr-api with Kaniko
 
