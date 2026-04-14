@@ -44,9 +44,10 @@ jobs:
           
           # 4. Ensure permissions are correct for the runner user
           sudo chown -R $USER:$USER /kaniko
-    
+
       - name: Build and Push with Kaniko
         env:
+          # Explicitly tell Kaniko where the config is
           DOCKER_CONFIG: /kaniko/.docker
         run: |
           /kaniko/executor \
@@ -56,13 +57,15 @@ jobs:
             --destination "harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}" \
             --cache=true \
             --cache-repo="harbor.nimar.gov.pk/mlops/fr-client-cache" \
-            --snapshotMode=redo \
+            --snapshot-mode=full \
+            --custom-platform=linux/amd64 \
             --insecure-registry "harbor.nimar.gov.pk" \
             --push-retry=3 \
             --verbosity=info \
             --ignore-path=/product_uuid \
             --ignore-path=/proc
-                
+
+            
 # name: Build & Push fr-api with Kaniko
 
 # on:
