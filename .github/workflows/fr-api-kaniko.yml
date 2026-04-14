@@ -50,7 +50,9 @@ jobs:
           # Explicitly tell Kaniko where the config is
           DOCKER_CONFIG: /kaniko/.docker
         run: |
-          /kaniko/executor \
+          # Use sudo for the executor if running on a host to allow filesystem manipulation 
+          # within the context, while ignoring the host's protected root paths.
+          sudo /kaniko/executor \
             --context "${{ github.workspace }}/mlops/APIs/fr-api" \
             --dockerfile "${{ github.workspace }}/mlops/APIs/fr-api/Dockerfile" \
             --destination "harbor.nimar.gov.pk/mlops/fr-client:latest" \
@@ -63,8 +65,9 @@ jobs:
             --push-retry=3 \
             --verbosity=info \
             --ignore-path=/product_uuid \
-            --ignore-path=/proc
-
+            --ignore-path=/proc \
+            --ignore-path=/sys \
+            --ignore-path=/
             
 # name: Build & Push fr-api with Kaniko
 
