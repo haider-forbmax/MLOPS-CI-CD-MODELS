@@ -1,3 +1,53 @@
+# name: Build & Push fr-api with Kaniko
+
+# on:
+#   push:
+#     branches: [ main ]
+#     paths:
+#       - 'mlops/APIs/fr-api/**'
+#   workflow_dispatch:
+
+# jobs:
+#   build-and-push:
+#     runs-on: fr-api-runners
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+
+#       - name: Test Login with Robot Account
+#         run: |
+#           echo "Testing Harbor login with current secrets..."
+#           echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor.nimar.gov.pk -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
+
+#       - name: Build and Push with Kaniko
+#         run: |
+#           echo "Setting up Kaniko authentication..."
+
+#           AUTH=$(printf "%s:%s" "${{ secrets.HARBOR_USERNAME }}" "${{ secrets.HARBOR_PASSWORD }}" | base64 -w 0)
+
+#           mkdir -p /kaniko/.docker
+
+#           echo "{\"auths\":{\"harbor.nimar.gov.pk\":{\"auth\":\"$AUTH\"}}}" > /kaniko/.docker/config.json
+
+#           echo "Debug auth file:"
+#           cat /kaniko/.docker/config.json
+
+#           echo "Starting Kaniko build and push..."
+
+#           /kaniko/executor \
+#             --context ./mlops/APIs/fr-api \
+#             --dockerfile ./mlops/APIs/fr-api/Dockerfile \
+#             --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
+#             --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
+#             --force \
+#             --cache=false \
+#             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
+#             --insecure-registry harbor.nimar.gov.pk \
+#             --push-retry=3
+
+
 name: Build & Push fr-api with Kaniko
 
 on:
@@ -15,34 +65,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-
-      - name: Test Login with Robot Account
-        run: |
-          echo "Testing Harbor login with current secrets..."
-          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor.nimar.gov.pk -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
-
       - name: Build and Push with Kaniko
-        run: |
-          echo "Setting up Kaniko authentication..."
-
-          AUTH=$(printf "%s:%s" "${{ secrets.HARBOR_USERNAME }}" "${{ secrets.HARBOR_PASSWORD }}" | base64 -w 0)
-
-          mkdir -p /kaniko/.docker
-
-          echo "{\"auths\":{\"harbor.nimar.gov.pk\":{\"auth\":\"$AUTH\"}}}" > /kaniko/.docker/config.json
-
-          echo "Debug auth file:"
-          cat /kaniko/.docker/config.json
-
-          echo "Starting Kaniko build and push..."
-
-          /kaniko/executor \
-            --context ./mlops/APIs/fr-api \
-            --dockerfile ./mlops/APIs/fr-api/Dockerfile \
-            --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
-            --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
-            --force \
-            --cache=false \
-            --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
-            --insecure-registry harbor.nimar.gov.pk \
+        uses: docker://gcr.io/kaniko-project/executor:v1.23.0-debug
+        with:
+          entrypoint: /kaniko/executor
+          args: |
+            --context ./mlops/APIs/fr-api
+            --dockerfile ./mlops/APIs/fr-api/Dockerfile
+            --destination harbor.nimar.gov.pk/mlops/fr-client:latest
+            --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}
+            --cache=true
+            --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache
+            --insecure-registry harbor.nimar.gov.pk
             --push-retry=3
+            --force   # optional
