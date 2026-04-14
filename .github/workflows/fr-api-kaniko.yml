@@ -37,20 +37,7 @@ jobs:
 
           echo "Starting Kaniko build and push..."
 
-          # /kaniko/executor \
-          #   --context ./mlops/APIs/fr-api \
-          #   --dockerfile ./mlops/APIs/fr-api/Dockerfile \
-          #   --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
-          #   --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
-          #   --cache=true \
-          #   --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
-          #   --insecure-registry harbor.nimar.gov.pk \
-          #   --push-retry=3
-
-
-
-
-          /kaniko-executor \
+          /kaniko/executor \
             --context ./mlops/APIs/fr-api \
             --dockerfile ./mlops/APIs/fr-api/Dockerfile \
             --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
@@ -59,3 +46,16 @@ jobs:
             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
             --insecure-registry harbor.nimar.gov.pk \
             --push-retry=3
+
+
+
+
+          # /kaniko-executor \
+          #   --context ./mlops/APIs/fr-api \
+          #   --dockerfile ./mlops/APIs/fr-api/Dockerfile \
+          #   --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
+          #   --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
+          #   --cache=true \
+          #   --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
+          #   --insecure-registry harbor.nimar.gov.pk \
+          #   --push-retry=3
