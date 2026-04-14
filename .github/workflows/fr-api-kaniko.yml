@@ -1,26 +1,41 @@
-- name: Build and Push with Kaniko
-  run: |
-    echo "Setting up Kaniko authentication..."
+name: Build & Push fr-api with Kaniko
 
-    AUTH=$(printf "%s:%s" "${{ secrets.HARBOR_USERNAME }}" "${{ secrets.HARBOR_PASSWORD }}" | base64 -w 0)
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mlops/APIs/fr-api/**'
+  workflow_dispatch:
 
-    mkdir -p /kaniko/.docker
+jobs:
+  build-and-push:
+    runs-on: fr-api-runners
 
-    cat > /kaniko/.docker/config.json <<EOF
-{"auths":{"harbor.nimar.gov.pk":{"auth":"$AUTH"}}}
-EOF
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    echo "Debug auth file:"
-    cat /kaniko/.docker/config.json
+      - name: Build and Push with Kaniko
+        run: |
+          echo "Setting up Kaniko authentication..."
 
-    echo "Starting Kaniko build and push..."
+          AUTH=$(printf "%s:%s" "${{ secrets.HARBOR_USERNAME }}" "${{ secrets.HARBOR_PASSWORD }}" | base64 -w 0)
 
-    /kaniko/executor \
-      --context ./mlops/APIs/fr-api \
-      --dockerfile ./mlops/APIs/fr-api/Dockerfile \
-      --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
-      --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
-      --cache=true \
-      --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
-      --insecure-registry harbor.nimar.gov.pk \
-      --push-retry=3
+          mkdir -p /kaniko/.docker
+
+          echo "{\"auths\":{\"harbor.nimar.gov.pk\":{\"auth\":\"$AUTH\"}}}" > /kaniko/.docker/config.json
+
+          echo "Debug auth file:"
+          cat /kaniko/.docker/config.json
+
+          echo "Starting Kaniko build and push..."
+
+          /kaniko/executor \
+            --context ./mlops/APIs/fr-api \
+            --dockerfile ./mlops/APIs/fr-api/Dockerfile \
+            --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
+            --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
+            --cache=true \
+            --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
+            --insecure-registry harbor.nimar.gov.pk \
+            --push-retry=3
