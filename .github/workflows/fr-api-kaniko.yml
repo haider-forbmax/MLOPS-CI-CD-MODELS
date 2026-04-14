@@ -41,6 +41,7 @@ jobs:
             --dockerfile ./mlops/APIs/fr-api/Dockerfile \
             --destination harbor.nimar.gov.pk/mlops/fr-client:latest \
             --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }} \
+            --force \
             --cache=false \
             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache \
             --insecure-registry harbor.nimar.gov.pk \
