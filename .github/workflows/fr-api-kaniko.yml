@@ -14,21 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: Build and Push with Kaniko
-      #   uses: docker://gcr.io/kaniko-project/executor:v1.23.0-debug
-      #   with:
-      #     entrypoint: /kaniko/executor
-      #     args: |
-      #       --context ./mlops/APIs/fr-api
-      #       --dockerfile ./mlops/APIs/fr-api/Dockerfile
-      #       --destination harbor.nimar.gov.pk/mlops/fr-client:latest
-      #       --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}
-      #       --cache=true
-      #       --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache
-      #       --insecure-registry harbor.nimar.gov.pk
-      #       --push-retry=3
-      #       --verbosity=info
-
+      # We must create the docker config so Kaniko can push to Harbor
+      - name: Create Kaniko Config
+        run: |
+          mkdir -p ~/.docker
+          # Use your robot account details here
+          # Format: echo -n "user:password" | base64
+          AUTH=$(echo -n 'robot$mlops+mlops:YOUR_ROBOT_SECRET' | base64)
+          echo "{\"auths\":{\"harbor.nimar.gov.pk\":{\"auth\":\"$AUTH\"}}}" > ~/.docker/config.json
 
       - name: Build and Push with Kaniko
         uses: docker://gcr.io/kaniko-project/executor:v1.23.0-debug
@@ -43,7 +36,6 @@ jobs:
             --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache
             --insecure-registry harbor.nimar.gov.pk
             --push-retry=3
-
 # name: Build & Push fr-api with Kaniko
 
 # on:
