@@ -17,6 +17,7 @@ jobs:
       - name: Setup Kaniko Auth
         run: |
           # 1. Prepare the directory
+          # Kaniko looks in /kaniko/.docker/config.json by default
           sudo mkdir -p /kaniko/.docker
           
           # 2. Generate Base64 auth string using your GitHub Secrets
@@ -42,19 +43,20 @@ jobs:
           }
           EOF
           
-          # 4. Ensure permissions are correct for the runner user
+          # 4. Ensure permissions are correct
           sudo chown -R $USER:$USER /kaniko
 
       - name: Build and Push with Kaniko
         run: |
-          # Use sudo for the executor if running on a host to allow filesystem manipulation.
-          # We explicitly pass --docker-config to ensure credentials are found even under sudo.
+          # Use sudo for the executor to allow filesystem manipulation.
+          # We use --force because we are running outside a standard container.
+          # We removed the invalid --docker-config flag.
           sudo /kaniko/executor \
             --context "${{ github.workspace }}/mlops/APIs/fr-api" \
             --dockerfile "${{ github.workspace }}/mlops/APIs/fr-api/Dockerfile" \
             --destination "harbor.nimar.gov.pk/mlops/fr-client:latest" \
             --destination "harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}" \
-            --docker-config /kaniko/.docker \
+            --force \
             --cache=true \
             --cache-repo="harbor.nimar.gov.pk/mlops/fr-client-cache" \
             --snapshot-mode=full \
