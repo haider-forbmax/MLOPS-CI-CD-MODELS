@@ -14,28 +14,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # We must create the docker config so Kaniko can push to Harbor
-      - name: Create Kaniko Config
+      - name: Setup Kaniko Auth
         run: |
+          # Create the config directory in the runner's home
           mkdir -p ~/.docker
-          # Use your robot account details here
-          # Format: echo -n "user:password" | base64
+          
+          # Encode the Harbor robot credentials
+          # IMPORTANT: Replace YOUR_ROBOT_SECRET with your actual Harbor secret
           AUTH=$(echo -n 'robot$mlops+mlops:YOUR_ROBOT_SECRET' | base64)
+          
+          # Write the config file
           echo "{\"auths\":{\"harbor.nimar.gov.pk\":{\"auth\":\"$AUTH\"}}}" > ~/.docker/config.json
+          
+          # Kaniko specifically looks for credentials in /kaniko/.docker/config.json.
+          # We use sudo to copy it to the system path prepared in your Dockerfile.
+          sudo mkdir -p /kaniko/.docker
+          sudo cp ~/.docker/config.json /kaniko/.docker/config.json
+          sudo chown -R runner:runner /kaniko
 
       - name: Build and Push with Kaniko
-        uses: docker://gcr.io/kaniko-project/executor:v1.23.0-debug
-        with:
-          entrypoint: /kaniko/executor
-          args: |
-            --context ./mlops/APIs/fr-api
-            --dockerfile ./mlops/APIs/fr-api/Dockerfile
-            --destination harbor.nimar.gov.pk/mlops/fr-client:latest
-            --destination harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}
-            --cache=true
-            --cache-repo=harbor.nimar.gov.pk/mlops/fr-client-cache
-            --insecure-registry harbor.nimar.gov.pk
-            --push-retry=3
+        run: |
+          # Execute the Kaniko binary directly from the local filesystem.
+          # We use absolute paths via github.workspace to ensure context is found.
+          /kaniko/executor \
+            --context "${{ github.workspace }}/mlops/APIs/fr-api" \
+            --dockerfile "${{ github.workspace }}/mlops/APIs/fr-api/Dockerfile" \
+            --destination "harbor.nimar.gov.pk/mlops/fr-client:latest" \
+            --destination "harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}" \
+            --cache=true \
+            --cache-repo="harbor.nimar.gov.pk/mlops/fr-client-cache" \
+            --insecure-registry "harbor.nimar.gov.pk" \
+            --push-retry=3 \
+            --verbosity=info
+            
 # name: Build & Push fr-api with Kaniko
 
 # on:
