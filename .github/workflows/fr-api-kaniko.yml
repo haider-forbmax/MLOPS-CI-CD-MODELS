@@ -11,9 +11,9 @@ jobs:
   build-and-push:
     runs-on: fr-api-runners
 
-    container:
-      image: gcr.io/kaniko-project/executor:v1.23.0-debug
-      options: --user root
+    # container:
+    #   image: gcr.io/kaniko-project/executor:v1.23.0-debug
+    #   options: --user root
 
     steps:
       - name: Checkout code
