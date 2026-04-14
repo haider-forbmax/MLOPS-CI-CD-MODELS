@@ -52,6 +52,13 @@ jobs:
 
       - name: Build and Push with Kaniko
         run: |
+          # FIX for 'unknown system group messagebus' error:
+          # When running Kaniko with --force on a host, dpkg issues can arise
+          # if the host's statoverride file contains groups not present in the image.
+          if [ -f /var/lib/dpkg/statoverride ]; then
+            sudo sed -i '/messagebus/d' /var/lib/dpkg/statoverride || true
+          fi
+
           # Use sudo -E to preserve environment variables (like DOCKER_CONFIG)
           # We set HOME=/kaniko so the executor looks in /kaniko/.docker/config.json
           # We also keep --force for host-based execution.
@@ -72,6 +79,10 @@ jobs:
             --ignore-path=/proc \
             --ignore-path=/sys \
             --ignore-path=/
+
+
+
+            
 # name: Build & Push fr-api with Kaniko
 
 # on:
