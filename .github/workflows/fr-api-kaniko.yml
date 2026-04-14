@@ -46,17 +46,15 @@ jobs:
           sudo chown -R $USER:$USER /kaniko
 
       - name: Build and Push with Kaniko
-        env:
-          # Explicitly tell Kaniko where the config is
-          DOCKER_CONFIG: /kaniko/.docker
         run: |
-          # Use sudo for the executor if running on a host to allow filesystem manipulation 
-          # within the context, while ignoring the host's protected root paths.
+          # Use sudo for the executor if running on a host to allow filesystem manipulation.
+          # We explicitly pass --docker-config to ensure credentials are found even under sudo.
           sudo /kaniko/executor \
             --context "${{ github.workspace }}/mlops/APIs/fr-api" \
             --dockerfile "${{ github.workspace }}/mlops/APIs/fr-api/Dockerfile" \
             --destination "harbor.nimar.gov.pk/mlops/fr-client:latest" \
             --destination "harbor.nimar.gov.pk/mlops/fr-client:${{ github.sha }}" \
+            --docker-config /kaniko/.docker \
             --cache=true \
             --cache-repo="harbor.nimar.gov.pk/mlops/fr-client-cache" \
             --snapshot-mode=full \
