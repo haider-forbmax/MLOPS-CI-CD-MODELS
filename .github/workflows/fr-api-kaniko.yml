@@ -1,87 +1,3 @@
-# name: Build & Push fr-api with Kaniko
-
-# on:
-#   push:
-#     branches: [ main ]
-#     paths:
-#       - 'mlops/APIs/fr-api/**'
-#   workflow_dispatch:
-
-# jobs:
-#   build-and-push:
-#     runs-on: fr-api-runners
-#     env:
-#       # Updated as requested: destination repository is now fr-openai-api
-#       MODEL_NAME: fr-openai-api 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-
-#       - name: Setup Kaniko Auth
-#         run: |
-#           # 1. Prepare the directory
-#           sudo mkdir -p /kaniko/.docker
-          
-#           # 2. Generate Base64 auth string using your GitHub Secrets
-#           USERNAME="${{ secrets.HARBOR_USERNAME }}"
-#           PASSWORD="${{ secrets.HARBOR_PASSWORD }}"
-          
-#           if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
-#             echo "Error: HARBOR_USERNAME or HARBOR_PASSWORD is empty. Please check your GitHub Secrets."
-#             exit 1
-#           fi
-
-#           # Create 'user:password' string and base64 encode it
-#           AUTH=$(echo -n "${USERNAME}:${PASSWORD}" | base64 -w 0)
-          
-#           # 3. Create config.json
-#           cat <<EOF | sudo tee /kaniko/.docker/config.json
-#           {
-#             "auths": {
-#               "harbor.nimar.gov.pk": {
-#                 "auth": "$AUTH"
-#               }
-#             }
-#           }
-#           EOF
-          
-#           # Also copy to root's home just in case sudo switches context fully
-#           sudo mkdir -p /root/.docker
-#           sudo cp /kaniko/.docker/config.json /root/.docker/config.json
-          
-#           # 4. Ensure permissions are correct
-#           sudo chown -R $USER:$USER /kaniko
-
-#       - name: Build and Push with Kaniko
-#         run: |
-#           # FIX for 'unknown system group messagebus' error:
-#           if [ -f /var/lib/dpkg/statoverride ]; then
-#             sudo sed -i '/messagebus/d' /var/lib/dpkg/statoverride || true
-#           fi
-
-#           # Use sudo -E to preserve environment variables.
-#           # CACHE DISABLED as requested (--cache=false)
-#           # destination is harbor.nimar.gov.pk/mlops/fr-openai-api:latest
-#           sudo -E HOME=/kaniko /kaniko/executor \
-#             --context "${{ github.workspace }}/mlops/APIs/fr-api" \
-#             --dockerfile "${{ github.workspace }}/mlops/APIs/fr-api/Dockerfile" \
-#             --destination "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
-#             --force \
-#             --cache=false \
-#             --snapshot-mode=full \
-#             --custom-platform=linux/amd64 \
-#             --insecure-registry "harbor.nimar.gov.pk" \
-#             --push-retry=3 \
-#             --verbosity=info \
-#             --ignore-path=/product_uuid \
-#             --ignore-path=/proc \
-#             --ignore-path=/sys \
-#             --ignore-path=/
-
-
-
-
-
 name: Build & Push fr-api with Kaniko
 
 on:
@@ -94,29 +10,32 @@ on:
 jobs:
   build-and-push:
     runs-on: fr-api-runners
-
-    container:
-      image: gcr.io/kaniko-project/executor:v1.23.0-debug
-      options: --user root
-
     env:
-      MODEL_NAME: fr-openai-api
-
+      # Updated as requested: destination repository is now fr-openai-api
+      MODEL_NAME: fr-openai-api 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub (Fix rate limit)
+      - name: Setup Kaniko Auth
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          # 1. Prepare the directory
+          sudo mkdir -p /kaniko/.docker
+          
+          # 2. Generate Base64 auth string using your GitHub Secrets
+          USERNAME="${{ secrets.HARBOR_USERNAME }}"
+          PASSWORD="${{ secrets.HARBOR_PASSWORD }}"
+          
+          if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+            echo "Error: HARBOR_USERNAME or HARBOR_PASSWORD is empty. Please check your GitHub Secrets."
+            exit 1
+          fi
 
-      - name: Setup Kaniko Auth for Harbor
-        run: |
-          mkdir -p /kaniko/.docker
-
-          AUTH=$(echo -n "${{ secrets.HARBOR_USERNAME }}:${{ secrets.HARBOR_PASSWORD }}" | base64 | tr -d '\n')
-
-          cat <<EOF > /kaniko/.docker/config.json
+          # Create 'user:password' string and base64 encode it
+          AUTH=$(echo -n "${USERNAME}:${PASSWORD}" | base64 -w 0)
+          
+          # 3. Create config.json
+          cat <<EOF | sudo tee /kaniko/.docker/config.json
           {
             "auths": {
               "harbor.nimar.gov.pk": {
@@ -125,19 +44,39 @@ jobs:
             }
           }
           EOF
-
-          echo "Kaniko auth configured for Harbor."
+          
+          # Also copy to root's home just in case sudo switches context fully
+          sudo mkdir -p /root/.docker
+          sudo cp /kaniko/.docker/config.json /root/.docker/config.json
+          
+          # 4. Ensure permissions are correct
+          sudo chown -R $USER:$USER /kaniko
 
       - name: Build and Push with Kaniko
         run: |
-          echo "Starting Kaniko build for ${{ env.MODEL_NAME }}..."
+          # FIX for 'unknown system group messagebus' error:
+          if [ -f /var/lib/dpkg/statoverride ]; then
+            sudo sed -i '/messagebus/d' /var/lib/dpkg/statoverride || true
+          fi
 
-          /kaniko/executor \
-            --context ./mlops/APIs/fr-api \
-            --dockerfile ./mlops/APIs/fr-api/Dockerfile \
-            --destination harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest \
-            --destination harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:${{ github.sha }} \
+          # Use sudo -E to preserve environment variables.
+          # CACHE DISABLED as requested (--cache=false)
+          # destination is harbor.nimar.gov.pk/mlops/fr-openai-api:latest
+          sudo -E HOME=/kaniko /kaniko/executor \
+            --context "${{ github.workspace }}/mlops/APIs/fr-api" \
+            --dockerfile "${{ github.workspace }}/mlops/APIs/fr-api/Dockerfile" \
+            --destination "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
+            --force \
             --cache=false \
-            --insecure-registry harbor.nimar.gov.pk \
+            --snapshot-mode=full \
+            --custom-platform=linux/amd64 \
+            --insecure-registry "harbor.nimar.gov.pk" \
             --push-retry=3 \
-            --verbosity=info
+            --verbosity=info \
+            --ignore-path=/product_uuid \
+            --ignore-path=/proc \
+            --ignore-path=/sys \
+            --ignore-path=/
+
+
+
