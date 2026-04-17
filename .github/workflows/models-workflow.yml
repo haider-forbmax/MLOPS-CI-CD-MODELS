@@ -5,7 +5,8 @@ on:
     branches: [ main ]
     paths:
       - 'mlops/APIs/**'
-  workflow_dispatch:  
+  workflow_dispatch:
+
 jobs:
   build-and-push:
     runs-on: api-runners
@@ -16,35 +17,33 @@ jobs:
             folder: doc-ocr
             dockerfile_path: Dockerfile
             image_repo: doc-ocr-api
-            paths: "mlops/APIs/doc-ocr/**"
 
           - model_name: emotion-api
             folder: emotion-api
             dockerfile_path: emotion_inference/Dockerfile
             image_repo: emotion-api
-            paths: "mlops/APIs/emotion-api/**"
 
           - model_name: fr-openai-api
             folder: fr-api
             dockerfile_path: Dockerfile
             image_repo: fr-openai-api
-            paths: "mlops/APIs/fr-api/**"
 
-          # Add your other 10 models similarly with their own "paths"
+          # Add your remaining 10 models here in the same format
+          # Example:
+          # - model_name: another-model
+          #   folder: another-folder
+          #   dockerfile_path: Dockerfile
+          #   image_repo: another-model
 
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 2           # Safe value when you have 13 models (increase to 3 later if cluster handles it)
 
-    # Only run the job if files in that model's path were changed
-    if: contains(github.event.paths, matrix.paths) || github.event_name == 'workflow_dispatch'
-    
     env:
       MODEL_NAME: ${{ matrix.model_name }}
       CONTEXT_PATH: mlops/APIs/${{ matrix.folder }}
       DOCKERFILE_PATH: mlops/APIs/${{ matrix.folder }}/${{ matrix.dockerfile_path }}
       IMAGE_REPO: ${{ matrix.image_repo }}
 
-      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
