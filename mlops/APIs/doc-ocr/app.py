@@ -1,4 +1,3 @@
-"testing the workflow for api runner scale set changes"
 """
 FastAPI Service for Enhanced Universal OCR
 Single endpoint that handles 30+ document formats
