@@ -67,9 +67,11 @@
 #               resources:
 #                 requests:
 #                   storage: 2Gi
+
+
 githubConfigUrl: "https://github.com/haider-forbmax/MLOPS-CI-CD-MODELS"
 githubConfigSecret: github-token-secret
-runnerScaleSetName: fr-api-runners
+runnerScaleSetName: api-runners
 minRunners: 1
 maxRunners: 5
 
@@ -79,7 +81,7 @@ containerMode:
 
 template:
   spec:
-    serviceAccountName: fr-api-runners-gha-rs-kube-mode
+    serviceAccountName: api-runners-gha-rs-kube-mode
     securityContext:
       fsGroup: 1001
     containers:
