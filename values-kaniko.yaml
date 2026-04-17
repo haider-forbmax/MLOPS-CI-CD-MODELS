@@ -81,7 +81,8 @@ containerMode:
 
 template:
   spec:
-    serviceAccountName: api-runners-gha-rs-kube-mode
+    # serviceAccountName: api-runners-gha-rs-kube-mode  # on another cluster this will be used
+    serviceAccountName: fr-api-runners-gha-rs-kube-mode
     securityContext:
       fsGroup: 1001
     containers:
