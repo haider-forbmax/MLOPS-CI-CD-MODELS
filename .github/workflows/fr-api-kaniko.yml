@@ -91,7 +91,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: fr-api-runners
+    runs-on: api-runners
     env:
       MODEL_NAME: fr-openai-api 
     steps:
