@@ -143,6 +143,8 @@ jobs:
               - 'mlops/APIs/logo/**'
             ocr-media:
               - 'mlops/APIs/ocr-media/**'
+            scene-api:
+              - 'mlops/APIs/scene-api/**'
             # ===================== ADD YOUR REMAINING 10 MODELS HERE =====================
             # your-model-name:
             #   - 'mlops/APIs/your-folder-name/**'
@@ -165,12 +167,14 @@ jobs:
             matrix.model == 'emotion-api' && 'emotion-api' ||
             matrix.model == 'logo-openai-api' && 'logo-openai-api' ||
             matrix.model == 'ocr-media' && 'ocr-media-api' ||
+            matrix.model == 'scene-api' && 'scene-detection-api' ||
             matrix.model == 'fr-openai-api' && 'fr-openai-api' || matrix.model }}
       FOLDER: >-
         ${{ matrix.model == 'doc-ocr' && 'doc-ocr' ||
             matrix.model == 'emotion-api' && 'emotion-api' ||
             matrix.model == 'logo-openai-api' && 'logo' ||
             matrix.model == 'ocr-media' && 'ocr-media' ||
+            matrix.model == 'scene-api' && 'scene-api' ||
             matrix.model == 'fr-openai-api' && 'fr-api' || matrix.model }}
       CONTEXT_PATH: >-
         ${{ matrix.model == 'emotion-api' && 'emotion_inference' || '.' }}
