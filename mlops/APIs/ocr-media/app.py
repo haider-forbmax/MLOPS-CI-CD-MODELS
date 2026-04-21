@@ -1,4 +1,4 @@
-# test the workflow for ocr media API
+# test the workflow for ocr media
 """
 Optimized Media OCR API
 - Fully async processing
