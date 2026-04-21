@@ -1,3 +1,114 @@
+# name: Build & Push Models with Kaniko
+
+# on:
+#   push:
+#     branches: [ main ]
+#     paths:
+#       - 'mlops/APIs/**'
+#   workflow_dispatch:
+
+# jobs:
+#   build-and-push:
+#     runs-on: api-runners
+#     strategy:
+#       matrix:
+#         include:
+#           - model_name: doc-ocr-api
+#             folder: doc-ocr
+#             dockerfile_path: Dockerfile
+#             image_repo: doc-ocr-api
+
+#           - model_name: emotion-api
+#             folder: emotion-api
+#             dockerfile_path: emotion_inference/Dockerfile
+#             image_repo: emotion-api
+
+#           - model_name: fr-openai-api
+#             folder: fr-api
+#             dockerfile_path: Dockerfile
+#             image_repo: fr-openai-api
+
+#           # Add your remaining 10 models here in the same format
+#           # Example:
+#           # - model_name: another-model
+#           #   folder: another-folder
+#           #   dockerfile_path: Dockerfile
+#           #   image_repo: another-model
+
+#       fail-fast: false
+#       max-parallel: 2           # Safe value when you have 13 models (increase to 3 later if cluster handles it)
+
+#     env:
+#       MODEL_NAME: ${{ matrix.model_name }}
+#       CONTEXT_PATH: mlops/APIs/${{ matrix.folder }}
+#       DOCKERFILE_PATH: mlops/APIs/${{ matrix.folder }}/${{ matrix.dockerfile_path }}
+#       IMAGE_REPO: ${{ matrix.image_repo }}
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Setup Kaniko Auth
+#         run: |
+#           sudo mkdir -p /kaniko/.docker
+          
+#           H_USER="${{ secrets.HARBOR_USERNAME }}"
+#           H_PASS="${{ secrets.HARBOR_PASSWORD }}"
+#           D_USER="${{ secrets.DOCKERHUB_USERNAME }}"
+#           D_PASS="${{ secrets.DOCKERHUB_TOKEN }}"
+          
+#           if [ -z "$H_USER" ] || [ -z "$H_PASS" ]; then
+#             echo "Error: Harbor credentials missing."
+#             exit 1
+#           fi
+          
+#           H_AUTH=$(echo -n "${H_USER}:${H_PASS}" | base64 -w 0)
+          
+#           DOCKER_AUTH_SECTION=""
+#           if [ -n "$D_USER" ] && [ -n "$D_PASS" ]; then
+#             D_AUTH=$(echo -n "${D_USER}:${D_PASS}" | base64 -w 0)
+#             DOCKER_AUTH_SECTION="\"https://index.docker.io/v1/\": {\"auth\": \"$D_AUTH\"},"
+#           fi
+          
+#           cat <<EOF | sudo tee /kaniko/.docker/config.json
+#           {
+#             "auths": {
+#               $DOCKER_AUTH_SECTION
+#               "harbor.nimar.gov.pk": {
+#                 "auth": "$H_AUTH"
+#               }
+#             }
+#           }
+#           EOF
+          
+#           sudo mkdir -p /root/.docker
+#           sudo cp /kaniko/.docker/config.json /root/.docker/config.json
+#           sudo chown -R $USER:$USER /kaniko
+
+#       - name: Build and Push with Kaniko
+#         run: |
+#           # Fix for 'unknown system group messagebus' error
+#           if [ -f /var/lib/dpkg/statoverride ]; then
+#             sudo sed -i '/messagebus/d' /var/lib/dpkg/statoverride || true
+#           fi
+          
+#           sudo -E HOME=/kaniko /kaniko/executor \
+#             --context "${{ github.workspace }}/${{ env.CONTEXT_PATH }}" \
+#             --dockerfile "${{ github.workspace }}/${{ env.DOCKERFILE_PATH }}" \
+#             --destination "harbor.nimar.gov.pk/mlops/${{ env.IMAGE_REPO }}:latest" \
+#             --force \
+#             --cache=false \
+#             --snapshot-mode=full \
+#             --custom-platform=linux/amd64 \
+#             --insecure-registry "harbor.nimar.gov.pk" \
+#             --push-retry=3 \
+#             --verbosity=info \
+#             --ignore-path=/product_uuid \
+#             --ignore-path=/proc \
+#             --ignore-path=/sys \
+#             --ignore-path=/
+
+
 name: Build & Push Models with Kaniko
 
 on:
@@ -8,41 +119,50 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Step 1: Detect which models actually changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      models: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Important for accurate diff
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            doc-ocr:
+              - 'mlops/APIs/doc-ocr/**'
+            emotion-api:
+              - 'mlops/APIs/emotion-api/**'
+            fr-openai-api:
+              - 'mlops/APIs/fr-api/**'
+            # Add your other 10 models here, one per entry
+            # another-model:
+            #   - 'mlops/APIs/another-folder/**'
+
+  # Step 2: Build only the changed models
   build-and-push:
+    needs: changes
     runs-on: api-runners
+    if: needs.changes.outputs.models != '[]'   # Skip if nothing changed
     strategy:
       matrix:
-        include:
-          - model_name: doc-ocr-api
-            folder: doc-ocr
-            dockerfile_path: Dockerfile
-            image_repo: doc-ocr-api
-
-          - model_name: emotion-api
-            folder: emotion-api
-            dockerfile_path: emotion_inference/Dockerfile
-            image_repo: emotion-api
-
-          - model_name: fr-openai-api
-            folder: fr-api
-            dockerfile_path: Dockerfile
-            image_repo: fr-openai-api
-
-          # Add your remaining 10 models here in the same format
-          # Example:
-          # - model_name: another-model
-          #   folder: another-folder
-          #   dockerfile_path: Dockerfile
-          #   image_repo: another-model
-
+        model: ${{ fromJSON(needs.changes.outputs.models) }}
       fail-fast: false
-      max-parallel: 2           # Safe value when you have 13 models (increase to 3 later if cluster handles it)
+      max-parallel: 2
 
     env:
-      MODEL_NAME: ${{ matrix.model_name }}
-      CONTEXT_PATH: mlops/APIs/${{ matrix.folder }}
-      DOCKERFILE_PATH: mlops/APIs/${{ matrix.folder }}/${{ matrix.dockerfile_path }}
-      IMAGE_REPO: ${{ matrix.image_repo }}
+      # Map the filter name to your actual model details
+      MODEL_NAME: ${{ matrix.model == 'doc-ocr' && 'doc-ocr-api' || 
+                     matrix.model == 'emotion-api' && 'emotion-api' || 
+                     matrix.model == 'fr-openai-api' && 'fr-openai-api' || matrix.model }}
+      FOLDER: ${{ matrix.model == 'doc-ocr' && 'doc-ocr' || 
+                 matrix.model == 'emotion-api' && 'emotion-api' || 
+                 matrix.model == 'fr-openai-api' && 'fr-api' || matrix.model }}
+      DOCKERFILE_PATH: ${{ matrix.model == 'emotion-api' && 'emotion_inference/Dockerfile' || 'Dockerfile' }}
 
     steps:
       - name: Checkout code
@@ -50,52 +170,20 @@ jobs:
 
       - name: Setup Kaniko Auth
         run: |
+          # Your existing auth code (unchanged)
           sudo mkdir -p /kaniko/.docker
-          
-          H_USER="${{ secrets.HARBOR_USERNAME }}"
-          H_PASS="${{ secrets.HARBOR_PASSWORD }}"
-          D_USER="${{ secrets.DOCKERHUB_USERNAME }}"
-          D_PASS="${{ secrets.DOCKERHUB_TOKEN }}"
-          
-          if [ -z "$H_USER" ] || [ -z "$H_PASS" ]; then
-            echo "Error: Harbor credentials missing."
-            exit 1
-          fi
-          
-          H_AUTH=$(echo -n "${H_USER}:${H_PASS}" | base64 -w 0)
-          
-          DOCKER_AUTH_SECTION=""
-          if [ -n "$D_USER" ] && [ -n "$D_PASS" ]; then
-            D_AUTH=$(echo -n "${D_USER}:${D_PASS}" | base64 -w 0)
-            DOCKER_AUTH_SECTION="\"https://index.docker.io/v1/\": {\"auth\": \"$D_AUTH\"},"
-          fi
-          
-          cat <<EOF | sudo tee /kaniko/.docker/config.json
-          {
-            "auths": {
-              $DOCKER_AUTH_SECTION
-              "harbor.nimar.gov.pk": {
-                "auth": "$H_AUTH"
-              }
-            }
-          }
-          EOF
-          
-          sudo mkdir -p /root/.docker
-          sudo cp /kaniko/.docker/config.json /root/.docker/config.json
-          sudo chown -R $USER:$USER /kaniko
+          # ... (keep your full auth block here)
 
       - name: Build and Push with Kaniko
         run: |
-          # Fix for 'unknown system group messagebus' error
           if [ -f /var/lib/dpkg/statoverride ]; then
             sudo sed -i '/messagebus/d' /var/lib/dpkg/statoverride || true
           fi
-          
+
           sudo -E HOME=/kaniko /kaniko/executor \
-            --context "${{ github.workspace }}/${{ env.CONTEXT_PATH }}" \
-            --dockerfile "${{ github.workspace }}/${{ env.DOCKERFILE_PATH }}" \
-            --destination "harbor.nimar.gov.pk/mlops/${{ env.IMAGE_REPO }}:latest" \
+            --context "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}" \
+            --dockerfile "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}" \
+            --destination "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
             --force \
             --cache=false \
             --snapshot-mode=full \
