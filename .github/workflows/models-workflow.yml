@@ -153,6 +153,10 @@ jobs:
               - 'mlops/APIs/stt-ft/**'
             summatrans:
               - 'mlops/APIs/summatrans/**'
+            ticker-flasher:
+              - 'mlops/APIs/ticker-flasher/**'
+            yolo11:
+              - 'mlops/APIs/yolo11/**'
             # ===================== ADD YOUR REMAINING 10 MODELS HERE =====================
             # your-model-name:
             #   - 'mlops/APIs/your-folder-name/**'
@@ -180,6 +184,8 @@ jobs:
             matrix.model == 'sr-api' && 'sr-api' ||
             matrix.model == 'stt-ft' && 'whisper-ft-api-triton-client' ||
             matrix.model == 'summatrans' && 'summatrans-api' ||
+            matrix.model == 'ticker-flasher' && 'ticker-flasher-openai-api' ||
+            matrix.model == 'yolo11' && 'yolo11-openai-api' ||
             matrix.model == 'fr-openai-api' && 'fr-openai-api' || matrix.model }}
       FOLDER: >-
         ${{ matrix.model == 'doc-ocr' && 'doc-ocr' ||
@@ -191,6 +197,8 @@ jobs:
             matrix.model == 'sr-api' && 'sr-api' ||
             matrix.model == 'stt-ft' && 'stt-ft' ||
             matrix.model == 'summatrans' && 'summatrans' ||
+            matrix.model == 'ticker-flasher' && 'ticker-flasher' ||
+            matrix.model == 'yolo11' && 'yolo11' ||
             matrix.model == 'fr-openai-api' && 'fr-api' || matrix.model }}
       CONTEXT_PATH: >-
         ${{ matrix.model == 'emotion-api' && 'emotion_inference' || '.' }}
