@@ -218,6 +218,51 @@ jobs:
           sudo cp /kaniko/.docker/config.json /root/.docker/config.json
           sudo chown -R root:root /kaniko /root/.docker
 
+      - name: Debug Build Context
+        run: |
+          echo "GITHUB_WORKSPACE=${{ github.workspace }}"
+          echo "GITHUB_SHA=${{ github.sha }}"
+          echo "GITHUB_REF=${{ github.ref }}"
+          echo "MODEL_NAME=${{ env.MODEL_NAME }}"
+          echo "FOLDER=${{ env.FOLDER }}"
+          echo "CONTEXT_PATH=${{ env.CONTEXT_PATH }}"
+          echo "DOCKERFILE_PATH=${{ env.DOCKERFILE_PATH }}"
+          echo "RUNNER_NAME=${{ runner.name }}"
+          echo "RUNNER_OS=${{ runner.os }}"
+          echo "---- repo root ----"
+          ls -la "${{ github.workspace }}"
+          echo "---- git status ----"
+          git -C "${{ github.workspace }}" status --short
+          echo "---- last commit ----"
+          git -C "${{ github.workspace }}" log -1 --stat
+          echo "---- model folder ----"
+          ls -la "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}"
+          echo "---- build context ----"
+          ls -la "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}"
+          if [ -f "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/.dockerignore" ]; then
+            echo "---- .dockerignore ----"
+            sed -n '1,200p' "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/.dockerignore"
+          fi
+          echo "---- Dockerfile ----"
+          sed -n '1,200p' "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}"
+          if [ -f "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}/requirements.txt" ]; then
+            echo "---- requirements.txt ----"
+            sed -n '1,200p' "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}/requirements.txt"
+          fi
+          echo "---- context files ----"
+          find "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}" -maxdepth 2 -type f | sort
+          echo "---- context size ----"
+          du -sh "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}"
+          if [ "${{ matrix.model }}" = "doc-ocr" ]; then
+            echo "---- doc-ocr file hashes ----"
+            sha256sum \
+              "${{ github.workspace }}/mlops/APIs/doc-ocr/Dockerfile" \
+              "${{ github.workspace }}/mlops/APIs/doc-ocr/requirements.txt" \
+              "${{ github.workspace }}/mlops/APIs/doc-ocr/app.py"
+            echo "---- doc-ocr top-level disk usage ----"
+            du -sh "${{ github.workspace }}/mlops/APIs/doc-ocr"/*
+          fi
+
       - name: Build and Push with Kaniko
         run: |
           # Fix for messagebus error
@@ -235,7 +280,7 @@ jobs:
             --custom-platform=linux/amd64 \
             --insecure-registry "harbor.nimar.gov.pk" \
             --push-retry=3 \
-            --verbosity=info \
+            --verbosity=debug \
             --ignore-path=/product_uuid \
             --ignore-path=/proc \
             --ignore-path=/sys \
