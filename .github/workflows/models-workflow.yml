@@ -149,6 +149,10 @@ jobs:
               - 'mlops/APIs/sentiment-api/**'
             sr-api:
               - 'mlops/APIs/sr-api/**'
+            stt-ft:
+              - 'mlops/APIs/stt-ft/**'
+            summatrans:
+              - 'mlops/APIs/summatrans/**'
             # ===================== ADD YOUR REMAINING 10 MODELS HERE =====================
             # your-model-name:
             #   - 'mlops/APIs/your-folder-name/**'
@@ -174,6 +178,8 @@ jobs:
             matrix.model == 'scene-api' && 'scene-detection-api' ||
             matrix.model == 'sentiment-api' && 'sentiment-api' ||
             matrix.model == 'sr-api' && 'sr-api' ||
+            matrix.model == 'stt-ft' && 'whisper-ft-api-triton-client' ||
+            matrix.model == 'summatrans' && 'summatrans-api' ||
             matrix.model == 'fr-openai-api' && 'fr-openai-api' || matrix.model }}
       FOLDER: >-
         ${{ matrix.model == 'doc-ocr' && 'doc-ocr' ||
@@ -183,6 +189,8 @@ jobs:
             matrix.model == 'scene-api' && 'scene-api' ||
             matrix.model == 'sentiment-api' && 'sentiment-api' ||
             matrix.model == 'sr-api' && 'sr-api' ||
+            matrix.model == 'stt-ft' && 'stt-ft' ||
+            matrix.model == 'summatrans' && 'summatrans' ||
             matrix.model == 'fr-openai-api' && 'fr-api' || matrix.model }}
       CONTEXT_PATH: >-
         ${{ matrix.model == 'emotion-api' && 'emotion_inference' || '.' }}
