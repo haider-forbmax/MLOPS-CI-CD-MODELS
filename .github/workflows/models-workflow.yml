@@ -284,4 +284,3 @@ jobs:
             --ignore-path=/product_uuid \
             --ignore-path=/proc \
             --ignore-path=/sys \
-            --ignore-path=/
