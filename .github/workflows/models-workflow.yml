@@ -164,6 +164,8 @@ jobs:
         ${{ matrix.model == 'doc-ocr' && 'doc-ocr' ||
             matrix.model == 'emotion-api' && 'emotion-api' ||
             matrix.model == 'fr-openai-api' && 'fr-api' || matrix.model }}
+      CONTEXT_PATH: >-
+        ${{ matrix.model == 'emotion-api' && 'emotion_inference' || '.' }}
       DOCKERFILE_PATH: >-
         ${{ matrix.model == 'emotion-api' && 'emotion_inference/Dockerfile' || 'Dockerfile' }}
 
@@ -216,7 +218,7 @@ jobs:
           fi
 
           sudo -E HOME=/kaniko /kaniko/executor \
-            --context "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}" \
+            --context "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}" \
             --dockerfile "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}" \
             --destination "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
             --force \
