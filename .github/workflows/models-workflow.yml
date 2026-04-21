@@ -109,7 +109,7 @@
 #             --ignore-path=/
 
 
-name: Build & Push Models with Kaniko
+name: Build & Push Models with Docker
 
 on:
   push:
@@ -181,42 +181,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Kaniko Auth
+      - name: Docker Info
         run: |
-          sudo mkdir -p /kaniko/.docker /root/.docker
-
-          H_USER="${{ secrets.HARBOR_USERNAME }}"
-          H_PASS="${{ secrets.HARBOR_PASSWORD }}"
-          D_USER="${{ secrets.DOCKERHUB_USERNAME }}"
-          D_PASS="${{ secrets.DOCKERHUB_TOKEN }}"
-
-          if [ -z "$H_USER" ] || [ -z "$H_PASS" ]; then
-            echo "Error: Harbor credentials missing."
-            exit 1
-          fi
-
-          H_AUTH=$(echo -n "${H_USER}:${H_PASS}" | base64 -w 0)
-
-          DOCKER_AUTH_SECTION=""
-          if [ -n "$D_USER" ] && [ -n "$D_PASS" ]; then
-            D_AUTH=$(echo -n "${D_USER}:${D_PASS}" | base64 -w 0)
-            DOCKER_AUTH_SECTION="\"https://index.docker.io/v1/\": {\"auth\": \"$D_AUTH\"},"
-          fi
-
-          # Create config.json properly
-          cat <<EOF | sudo tee /kaniko/.docker/config.json
-          {
-            "auths": {
-              ${DOCKER_AUTH_SECTION}
-              "harbor.nimar.gov.pk": {
-                "auth": "$H_AUTH"
-              }
-            }
-          }
-          EOF
-
-          sudo cp /kaniko/.docker/config.json /root/.docker/config.json
-          sudo chown -R root:root /kaniko /root/.docker
+          docker version
+          docker info
 
       - name: Debug Build Context
         run: |
@@ -263,24 +231,24 @@ jobs:
             du -sh "${{ github.workspace }}/mlops/APIs/doc-ocr"/*
           fi
 
-      - name: Build and Push with Kaniko
+      - name: Login to Harbor
         run: |
-          # Fix for messagebus error
-          if [ -f /var/lib/dpkg/statoverride ]; then
-            sudo sed -i '/messagebus/d' /var/lib/dpkg/statoverride || true
+          if [ -z "${{ secrets.HARBOR_USERNAME }}" ] || [ -z "${{ secrets.HARBOR_PASSWORD }}" ]; then
+            echo "Error: Harbor credentials missing."
+            exit 1
           fi
 
-          sudo -E HOME=/kaniko /kaniko/executor \
-            --context "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}" \
-            --dockerfile "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}" \
-            --destination "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
-            --force \
-            --cache=false \
-            --snapshot-mode=full \
-            --custom-platform=linux/amd64 \
-            --insecure-registry "harbor.nimar.gov.pk" \
-            --push-retry=3 \
-            --verbosity=debug \
-            --ignore-path=/product_uuid \
-            --ignore-path=/proc \
-            --ignore-path=/sys \
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor.nimar.gov.pk \
+            -u "${{ secrets.HARBOR_USERNAME }}" \
+            --password-stdin
+
+      - name: Build Image
+        run: |
+          docker build \
+            --file "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}" \
+            --tag "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
+            "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}"
+
+      - name: Push Image
+        run: |
+          docker push "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest"
