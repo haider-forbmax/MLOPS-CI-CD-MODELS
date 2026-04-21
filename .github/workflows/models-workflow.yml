@@ -139,6 +139,8 @@ jobs:
               - 'mlops/APIs/emotion-api/**'
             fr-openai-api:
               - 'mlops/APIs/fr-api/**'
+            logo-openai-api:
+              - 'mlops/APIs/logo/**'
             # ===================== ADD YOUR REMAINING 10 MODELS HERE =====================
             # your-model-name:
             #   - 'mlops/APIs/your-folder-name/**'
@@ -159,10 +161,12 @@ jobs:
       MODEL_NAME: >-
         ${{ matrix.model == 'doc-ocr' && 'doc-ocr-api' ||
             matrix.model == 'emotion-api' && 'emotion-api' ||
+            matrix.model == 'logo-openai-api' && 'logo-openai-api' ||
             matrix.model == 'fr-openai-api' && 'fr-openai-api' || matrix.model }}
       FOLDER: >-
         ${{ matrix.model == 'doc-ocr' && 'doc-ocr' ||
             matrix.model == 'emotion-api' && 'emotion-api' ||
+            matrix.model == 'logo-openai-api' && 'logo' ||
             matrix.model == 'fr-openai-api' && 'fr-api' || matrix.model }}
       CONTEXT_PATH: >-
         ${{ matrix.model == 'emotion-api' && 'emotion_inference' || '.' }}
