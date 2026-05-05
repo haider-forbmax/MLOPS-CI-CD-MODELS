@@ -273,7 +273,7 @@ jobs:
       - name: Build Image
         run: |
           docker build \
-            --file "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}" \
+            --file "${{ github.workspace }}/APIs/${{ env.FOLDER }}/${{ env.DOCKERFILE_PATH }}" \
             --tag "harbor.nimar.gov.pk/mlops/${{ env.MODEL_NAME }}:latest" \
             "${{ github.workspace }}/mlops/APIs/${{ env.FOLDER }}/${{ env.CONTEXT_PATH }}"
 
